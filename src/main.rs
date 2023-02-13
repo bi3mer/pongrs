@@ -1,6 +1,7 @@
 
 use macroquad::prelude::*;
 
+mod ui;
 mod scene;
 use scene::{menu::Menu, game::Game, scene_id::SceneId, scene_trait::Scene};
 
