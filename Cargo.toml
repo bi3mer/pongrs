@@ -1,0 +1,25 @@
+[package]
+name = "pongrs"
+version = "1.67.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[workspace]
+resolver = "2" 
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+lto = true
+opt-level = 3
+
+[dependencies]
+macroquad = "0.3"
+getrandom = { version = "0.2", features = ["js"] }
