@@ -2,9 +2,10 @@ use crate::scene::scene_id::SceneId;
 use crate::scene::scene_trait::Scene;
 use macroquad::math::f32::Vec2;
 use macroquad::window::{screen_width, screen_height};
-use macroquad::shapes::draw_rectangle;
+use macroquad::shapes::{draw_rectangle, draw_circle};
 use macroquad::color::WHITE;
 use macroquad::text::draw_text;
+use macroquad::input::{is_key_down, KeyCode};
 
 pub struct Game {
     player_score: u8,
@@ -19,18 +20,15 @@ pub struct Game {
 
 impl Game {
     pub fn new() -> Self {
-        let w = screen_width();
-        let h = screen_height();
-
         Game {
             player_score: 0,
             ai_score: 0,
-            player_paddle: Vec2::new(30., h/2.),
-            ai_paddle: Vec2::new(w-30., h/2.),
-            ball_pos: Vec2::new(w/2., h/2.),
+            player_paddle: Vec2::new(0.05, 0.4),
+            ai_paddle: Vec2::new(0.95, 0.4),
+            ball_pos: Vec2::new(0.5, 0.5),
             ball_velocity: Vec2::new(0., 0.),
-            paddle_dimensions: Vec2::new(10., 100.),
-            ball_dimensions: Vec2::new(10., 10.)
+            paddle_dimensions: Vec2::new(0.008, 0.2),
+            ball_dimensions: Vec2::new(0.02, 0.02)
         }
     }
 }
@@ -41,6 +39,23 @@ impl Scene for Game {
     }
 
     fn update(&mut self) -> SceneId {
+        // player update
+        if is_key_down(KeyCode::S) {
+            self.player_paddle.y = f32::min(1. - self.paddle_dimensions.y, self.player_paddle.y + 0.01);
+        }
+        if is_key_down(KeyCode::W) {
+            self.player_paddle.y = f32::max(0., self.player_paddle.y - 0.01);
+        }
+
+        // ball update
+
+        // AI update
+        if self.ball_pos.y > self.ai_paddle.y + self.paddle_dimensions.y/2. {
+            self.ai_paddle.y = f32::min(1. - self.paddle_dimensions.y, self.ai_paddle.y + 0.01);
+        } else if self.ball_pos.y < self.ai_paddle.y + self.paddle_dimensions.y/2. {
+            self.ai_paddle.y = f32::max(0., self.ai_paddle.y - 0.01);
+        }
+
         SceneId::Game
     }
 
@@ -61,29 +76,28 @@ impl Scene for Game {
         }
 
         // render ball
-        draw_rectangle(
-            self.ball_pos.x, 
-            self.ball_pos.y, 
-            self.ball_dimensions.x,
-            self.ball_dimensions.y,
+        draw_circle(
+            self.ball_pos.x * w, 
+            self.ball_pos.y * h, 
+            f32::max(self.ball_dimensions.x * w, self.ball_dimensions.y * h) / 2.,
             WHITE
-    );
+        );
 
         // draw player paddle
         draw_rectangle(
-            self.player_paddle.x,
-            self.player_paddle.y,
-            self.paddle_dimensions.x,
-            self.paddle_dimensions.y,
+            self.player_paddle.x * w,
+            self.player_paddle.y * h,
+            self.paddle_dimensions.x * w,
+            self.paddle_dimensions.y * h,
             WHITE
         );
 
         // draw AI paddle
         draw_rectangle(
-            self.ai_paddle.x,
-            self.ai_paddle.y,
-            self.paddle_dimensions.x,
-            self.paddle_dimensions.y,
+            self.ai_paddle.x * w,
+            self.ai_paddle.y * h,
+            self.paddle_dimensions.x * w,
+            self.paddle_dimensions.y * h,
             WHITE
         );
 
@@ -108,16 +122,13 @@ impl Scene for Game {
     }
 
     fn on_exit(&mut self) {
-        // reset
-        let w = screen_width();
-        let h = screen_height();
-
         self.player_score = 0;
         self.ai_score = 0;
-        self.player_paddle = Vec2::new(10., h/2.);
-        self.ai_paddle = Vec2::new(w-10., h/2.);
-        self.ball_pos = Vec2::new(w/2., h/2.);
+        self.player_paddle = Vec2::new(0.05, 0.4);
+        self.ai_paddle = Vec2::new(0.95, 0.4);
+        self.ball_pos = Vec2::new(0.5, 0.5);
         self.ball_velocity = Vec2::new(0., 0.);
-        self.paddle_dimensions = Vec2::new(10., 30.)
+        self.paddle_dimensions = Vec2::new(0.008, 0.2);
+        self.ball_dimensions = Vec2::new(0.02, 0.02);
     }
 }
