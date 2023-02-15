@@ -11,7 +11,8 @@ pub struct Button {
     font_size: f32,
     font_color: Color,
     is_active: bool,
-    clicked: bool
+    clicked: bool,
+    mouse_in_bounds: bool
 }
 
 impl Button {
@@ -27,7 +28,8 @@ impl Button {
             font_size: 12.,
             font_color: BLACK,
             is_active: true,
-            clicked: false
+            clicked: false,
+            mouse_in_bounds: false
         }
     }
 
@@ -73,20 +75,26 @@ impl Button {
         self
     }
 
-    pub fn draw(&mut self) -> bool {
+    pub fn update(&mut self) {
         let p = mouse_position();
-        let mouse_in_bounds = 
+        self.mouse_in_bounds = 
             self.is_active && 
             p.0 >= self.x && 
             p.0 <= self.x+self.w && 
             p.1 >= self.y && 
             p.1 <= self.y+self.h;
 
-        let rec_color = 
-            if self.hover_color.is_some() && mouse_in_bounds 
-                { self.hover_color.unwrap() } 
-            else 
-                { self.color };
+        self.clicked = 
+            self.is_active && 
+            self.mouse_in_bounds && 
+            is_mouse_button_released(MouseButton::Left);
+    }
+
+    pub fn render(&self) {
+        let rec_color = if self.hover_color.is_some() && self.mouse_in_bounds 
+            { self.hover_color.unwrap() } 
+        else 
+            { self.color };
 
         draw_rectangle(
             self.x,
@@ -105,12 +113,9 @@ impl Button {
                 self.font_color
             ); 
         }
+    }
 
-        self.clicked = 
-            self.is_active && 
-            mouse_in_bounds && 
-            is_mouse_button_released(MouseButton::Left);
-
+    pub fn was_clicked(&self) -> bool {
         self.clicked
     }
 }
