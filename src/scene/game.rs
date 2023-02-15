@@ -102,21 +102,20 @@ impl Scene for Game {
         );
 
         // draw player score
-        let mid_point = w / 2.;
         draw_text(
             &self.player_score.to_string(), 
-            mid_point - mid_point/2., 
-            100., 
-            60., 
+            0.25*w, 
+            0.1*w, 
+            0.05*w, 
             WHITE
         );
 
         // draw AI score
         draw_text(
             &self.ai_score.to_string(), 
-            mid_point + mid_point/2., 
-            100., 
-            60., 
+            0.75*w, 
+            0.1*w, 
+            0.05*w, 
             WHITE
         );
     }
