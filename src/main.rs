@@ -23,15 +23,14 @@ async fn main() {
 
         if new_scene != scene {
             current_scene.on_exit();
+            scene = new_scene;
+            
             match scene {
                 SceneId::Menu => {
-                    scene = SceneId::Game;
-                    current_scene = &mut game_scene;
-
+                    current_scene = &mut menu_scene;
                 },
                 SceneId::Game => {
-                    scene = SceneId::Menu;
-                    current_scene = &mut menu_scene;
+                    current_scene = &mut game_scene;
                 },
                 SceneId::GameOver => {
                     panic!("GameOver scene not implemented!");

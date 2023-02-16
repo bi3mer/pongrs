@@ -109,8 +109,30 @@ impl Scene for Game {
         self.ball_velocity *= 1.00001;
 
         // Check if the ball has made it to the end for either player
+        let mut next_scene = SceneId::Game;
+        if self.ball_pos.x <= 0. {
+            self.ai_score += 1;
+            self.ball_velocity.x = -0.3;
+            self.ball_velocity.y = 0.;
+            self.ball_pos.x = 0.5;
+            self.ball_pos.y = 0.5;
+            
+            if self.ai_score >= 3 {
+                next_scene = SceneId::GameOver;
+            }
+        } else if self.ball_pos.x >= 1. {
+            self.player_score += 1;
+            self.ball_velocity.x = 0.3;
+            self.ball_velocity.y = 0.;
+            self.ball_pos.x = 0.5;
+            self.ball_pos.y = 0.5;
 
-        SceneId::Game
+            if self.player_score >= 3 {
+                next_scene = SceneId::GameOver;
+            }
+        }
+
+        next_scene
     }
 
     fn render(&mut self) {
