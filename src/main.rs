@@ -17,8 +17,8 @@ async fn main() {
 
     loop {
         clear_background(BLACK);
-
-        let new_scene = current_scene.update();
+        
+        let new_scene = current_scene.update(get_frame_time());
         current_scene.render();
 
         if new_scene != scene {
@@ -33,6 +33,9 @@ async fn main() {
                     scene = SceneId::Menu;
                     current_scene = &mut menu_scene;
                 },
+                SceneId::GameOver => {
+                    panic!("GameOver scene not implemented!");
+                }
             }
             current_scene.on_enter();
         }

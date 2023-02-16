@@ -30,7 +30,7 @@ impl Scene for Menu {
         // nothing to do
     }
     
-    fn update(&mut self) -> SceneId {
+    fn update(&mut self, _dt: f32) -> SceneId {
         let center = get_text_center(" Play", None, 32, 1., 0.);
         self.play_button.pos(screen_width()/2. - center.x, screen_height()/2. - center.y);
         self.play_button.update();
