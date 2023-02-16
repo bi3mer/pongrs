@@ -68,11 +68,16 @@ impl Game {
             self.ball_velocity.y -= 0.5;
         }
     }
+
+    pub fn get_winner(&self) -> &str {
+        if self.ai_score >= 3 { "AI" } else { "Player" }
+    }
 }
 
 impl Scene for Game {
     fn on_enter(&mut self) {
-        // Nothing to do   
+        self.player_score = 0;
+        self.ai_score = 0; 
     }
 
     fn update(&mut self, dt: f32) -> SceneId {
@@ -197,8 +202,6 @@ impl Scene for Game {
     }
 
     fn on_exit(&mut self) {
-        self.player_score = 0;
-        self.ai_score = 0;
         self.player_paddle = Vec2::new(0.05, 0.4);
         self.ai_paddle = Vec2::new(0.95, 0.4);
         self.ball_pos = Vec2::new(0.5, 0.5);

@@ -2,5 +2,5 @@
 pub enum SceneId {
     Menu,
     Game,
-    GameOver
+    GameOver,
 }
