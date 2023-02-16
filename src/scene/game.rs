@@ -58,14 +58,26 @@ impl Game {
         
         // Figure out where the collision occurred on the paddle and update
         // the velocity accordingly
-        // TODO: make this percentage based
-        let paddle_upper = paddle_bottom - (2. * self.paddle_dimensions.y / 3.);
-	    let paddle_middle = paddle_bottom - (self.paddle_dimensions.y / 3.);
+        let paddle_mid_point = paddle_bottom - (self.paddle_dimensions.y/2.);
+        let ball_mid_point = self.ball_pos.y + (self.ball_dimensions.y/2.);
 
-        if ball_bottom > paddle_middle {
-            self.ball_velocity.y += 0.5;
-        } else if ball_top < paddle_upper {
-            self.ball_velocity.y -= 0.5;
+        if paddle_mid_point < ball_mid_point {
+            self.ball_velocity.y = f32::min(
+                0.75,
+                paddle_top*(1.-ball_mid_point) + (paddle_mid_point*ball_mid_point)
+            );
+        } else {
+            self.ball_velocity.y = f32::max(
+                -0.75,
+                -(paddle_mid_point*(1.-ball_mid_point) + (paddle_top*ball_mid_point))
+            );
+        }
+        
+        // prevent an infinite collision by putting the ball outside the paddle
+        if self.ball_pos.x < 0.5 {
+            self.ball_pos.x = paddle.x + self.paddle_dimensions.x + 0.01;
+        } else {
+            self.ball_pos.x = paddle.x - self.paddle_dimensions.x - 0.01;
         }
     }
 
@@ -94,9 +106,9 @@ impl Scene for Game {
 
         // Update AI paddle
         if self.ball_pos.y > self.ai_paddle.y + self.paddle_dimensions.y/2. {
-            self.ai_paddle.y = f32::min(1. - self.paddle_dimensions.y, self.ai_paddle.y + 0.02);
+            self.ai_paddle.y = f32::min(1. - self.paddle_dimensions.y, self.ai_paddle.y + 0.01);
         } else if self.ball_pos.y < self.ai_paddle.y + self.paddle_dimensions.y/2. {
-            self.ai_paddle.y = f32::max(0., self.ai_paddle.y - 0.02);
+            self.ai_paddle.y = f32::max(0., self.ai_paddle.y - 0.01);
         }
 
         // Check for collisions between the ball and both paddles
@@ -111,7 +123,11 @@ impl Scene for Game {
         } 
 
         // make game more difficult each frame
-        self.ball_velocity *= 1.00001;
+        if self.paddle_dimensions.y >= 0.08 {
+            self.paddle_dimensions.y *= 0.9995;
+        } else {
+            self.ball_velocity *= 1.001;
+        }
 
         // Check if the ball has made it to the end for either player
         let mut next_scene = SceneId::Game;
@@ -121,6 +137,7 @@ impl Scene for Game {
             self.ball_velocity.y = 0.;
             self.ball_pos.x = 0.5;
             self.ball_pos.y = 0.5;
+            self.paddle_dimensions.y = 0.2;
             
             if self.ai_score >= 3 {
                 next_scene = SceneId::GameOver;
@@ -131,6 +148,7 @@ impl Scene for Game {
             self.ball_velocity.y = 0.;
             self.ball_pos.x = 0.5;
             self.ball_pos.y = 0.5;
+            self.paddle_dimensions.y = 0.2;
 
             if self.player_score >= 3 {
                 next_scene = SceneId::GameOver;
